@@ -4,6 +4,7 @@ import alex.carcar.beatbox.databinding.ActivityMainBinding
 import alex.carcar.beatbox.databinding.ListItemSoundBinding
 import android.os.Bundle
 import android.view.ViewGroup
+import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.GridLayoutManager
@@ -22,6 +23,20 @@ class MainActivity : AppCompatActivity() {
         binding.recyclerView.apply {
             layoutManager = GridLayoutManager(context, 3)
             adapter = SoundAdapter(beatBox.sounds)
+        }
+
+        binding.soundSpeed.apply {
+            setOnSeekBarChangeListener(object :
+                SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(sb: SeekBar?, progress: Int, fromUser: Boolean) {
+                    val soundLabel = "${getString(R.string.playback_speed)} $progress"
+                    binding.soundSpeedLabel.text = soundLabel
+                    beatBox.rate = progress
+                }
+
+                override fun onStartTrackingTouch(seekBar: SeekBar?) {}
+                override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+            })
         }
     }
 
