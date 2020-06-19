@@ -6,34 +6,40 @@ import android.os.Bundle
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 class MainActivity : AppCompatActivity() {
-
-    private lateinit var beatBox: BeatBox
+    private val beatViewModel: BeatViewModel by lazy {
+        ViewModelProviders.of(this).get(BeatViewModel::class.java)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        beatBox = BeatBox(assets)
+
+        if (beatViewModel.initialLoad) {
+            beatViewModel.beatBox = BeatBox(assets)
+            beatViewModel.initialLoad = false
+        }
         val binding: ActivityMainBinding =
             DataBindingUtil.setContentView(this, R.layout.activity_main)
 
         binding.recyclerView.apply {
             layoutManager = GridLayoutManager(context, 3)
-            adapter = SoundAdapter(beatBox.sounds)
+            adapter = SoundAdapter(beatViewModel.beatBox.sounds)
         }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        beatBox.release()
+        beatViewModel.beatBox.release()
     }
 
     private inner class SoundHolder(private val binding: ListItemSoundBinding) :
         RecyclerView.ViewHolder(binding.root) {
         init {
-            binding.viewModel = SoundViewModel(beatBox)
+            binding.viewModel = SoundViewModel(beatViewModel.beatBox)
         }
 
         fun bind(sound: Sound) {
